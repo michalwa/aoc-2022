@@ -1,8 +1,10 @@
 use std::{collections::HashMap, env, fs::File, io::BufReader};
 
 mod day_1;
+mod day_2;
 
 use day_1::Day1;
+use day_2::Day2;
 
 const USAGE: &str = "Usage: aoc-2022 <day> <input-file>";
 
@@ -14,6 +16,7 @@ fn main() {
     let days = {
         let mut days = HashMap::<_, Box<dyn Day>>::new();
         days.insert("day_1", Box::new(Day1));
+        days.insert("day_2", Box::new(Day2));
         days
     };
 
