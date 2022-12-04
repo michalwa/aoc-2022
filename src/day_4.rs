@@ -31,6 +31,7 @@ fn parse_range(s: &str) -> Option<RangeInclusive<u32>> {
     Some(start.parse::<u32>().ok()?..=end.parse::<u32>().ok()?)
 }
 
+#[allow(dead_code)]
 fn is_subrange(a: &RangeInclusive<u32>, b: &RangeInclusive<u32>) -> bool {
     a.start() >= b.start() && a.end() <= b.end()
 }
