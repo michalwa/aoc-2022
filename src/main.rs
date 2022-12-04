@@ -5,10 +5,12 @@ use std::{collections::HashMap, env, fs::File, io::BufReader};
 mod day_1;
 mod day_2;
 mod day_3;
+mod day_4;
 
 use day_1::Day1;
 use day_2::Day2;
 use day_3::Day3;
+use day_4::Day4;
 
 const USAGE: &str = "Usage: aoc-2022 <day> <input-file>";
 
@@ -22,6 +24,7 @@ fn main() {
         days.insert("day_1", Box::new(Day1));
         days.insert("day_2", Box::new(Day2));
         days.insert("day_3", Box::new(Day3));
+        days.insert("day_4", Box::new(Day4));
         days
     };
 
