@@ -1,6 +1,5 @@
 use crate::Day;
 use std::{
-    collections::HashSet,
     fs::File,
     io::{BufRead, BufReader},
 };
@@ -19,15 +18,20 @@ impl Day for Day3 {
             // })
             // Part 2
             .array_chunks::<3>()
-            .flat_map(|lines| {
+            // Both
+            .map(|lines| {
                 lines
                     .into_iter()
-                    .map(|lines| lines.bytes().collect::<HashSet<_>>())
-                    .reduce(|a, b| a.intersection(&b).copied().collect())
+                    .map(|lines| {
+                        lines
+                            .bytes()
+                            .map(|b| 1u64 << priority(b))
+                            .fold(0, |a, b| a | b)
+                    })
+                    .reduce(|a, b| a & b)
                     .unwrap()
-                    .into_iter()
-                    .map(|byte| priority(byte) as u32)
             })
+            .map(sum_priorities)
             .sum::<u32>();
 
         println!("{priority_sum}");
@@ -40,4 +44,8 @@ fn priority(byte: u8) -> u8 {
         b'A'..=b'Z' => byte - b'A' + 27,
         _ => panic!("bad rucksack item"),
     }
+}
+
+fn sum_priorities(bitset: u64) -> u32 {
+    (0..64).filter(|i| bitset & (1 << i) != 0).sum()
 }
