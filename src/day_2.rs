@@ -17,16 +17,21 @@ impl Day for Day2 {
 
                 // Part 1
                 // let player = rock_paper_scissors(line[2]);
+                // let score = match () {
+                //     _ if opponent == prev(player) => 6,
+                //     _ if opponent == player => 3,
+                //     _ => 0,
+                // };
+                //
+                // score + player as u32 + 1
 
                 // Part 2
-                let player = match line[2] {
-                    b'X' => (opponent + 2) % 3,
-                    b'Y' => opponent,
-                    b'Z' => (opponent + 1) % 3,
-                    _ => panic!("unsupported byte"),
-                };
-
-                score(player, opponent) + player as u32 + 1
+                (match line[2] {
+                    b'X' => prev(opponent) + 1,
+                    b'Y' => opponent + 1 + 3,
+                    b'Z' => next(opponent) + 1 + 6,
+                    _ => unreachable!(),
+                }) as u32
             })
             .sum::<u32>();
 
@@ -34,19 +39,14 @@ impl Day for Day2 {
     }
 }
 
+fn next(rps: u8) -> u8 { (rps + 1) % 3 }
+fn prev(rps: u8) -> u8 { (rps + 2) % 3 }
+
 fn rock_paper_scissors(byte: u8) -> u8 {
     match byte {
         b'A' | b'X' => 0,
         b'B' | b'Y' => 1,
         b'C' | b'Z' => 2,
-        _ => panic!("unsupported byte"),
-    }
-}
-
-fn score(player: u8, opponent: u8) -> u32 {
-    match () {
-        _ if opponent == (player + 2) % 3 => 6,
-        _ if opponent == player => 3,
-        _ => 0,
+        _ => unreachable!(),
     }
 }
