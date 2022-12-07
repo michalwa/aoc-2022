@@ -69,14 +69,26 @@ dir_size(dir_files(_, Fs), S) :-
     maplist(dir_size, Fs, Ss),
     sum(Ss, #=, S).
 
-at_most_100000(S) :- S #=< 100000.
+at_most(N, S) :- S #=< N.
+at_least(N, S) :- S #>= N.
 
 run :-
     phrase_from_file(input_lines(Ls), 'input/day_7/input.txt'),
     T0 = tree_cd(dir_files("/", []), []),
     foldl(command_extend_tree, Ls, T0, tree_cd(T, _)),
     dir_sizes(T, Ss),
-    include(at_most_100000, Ss, Ss1),
-    sum(Ss1, #=, S),
-    portray_clause(S),
+
+    % Part 1
+    % include(at_most(100000), Ss, Ss1),
+    % sum(Ss1, #=, S),
+    % portray_clause(S),
+
+    % Part 2
+    dir_size(T, TotalSize),
+    FreeSpace #= 70000000 - TotalSize,
+    SpaceNeeded #= 30000000 - FreeSpace,
+    include(at_least(SpaceNeeded), Ss, Ss1),
+    list_min(Ss1, Min),
+    portray_clause(Min),
+
     halt.
