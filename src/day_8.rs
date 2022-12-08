@@ -8,6 +8,14 @@ pub struct Day8;
 
 impl Day for Day8 {
     fn solve(&self, input: BufReader<File>) {
+        // self.part_1(input);
+        self.part_2(input);
+    }
+}
+
+#[allow(dead_code)]
+impl Day8 {
+    fn part_1(&self, input: BufReader<File>) {
         let mut rows = input
             .lines()
             .map(Result::unwrap)
@@ -35,6 +43,42 @@ impl Day for Day8 {
 
         println!("{visible_count}");
     }
+
+    fn part_2(&self, input: BufReader<File>) {
+        let rows = input
+            .lines()
+            .map(Result::unwrap)
+            .map(|line| {
+                line.chars()
+                    .map(|c| c.to_digit(10).unwrap())
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+
+
+        let mut max_score = 0;
+
+        for (i, row) in rows.iter().enumerate().skip(1).take(rows.len() - 2) {
+            for (j, &tree) in row.iter().enumerate().skip(1).take(row.len() - 2)
+            {
+                let score = [
+                    count_visible_trees(tree, (0..i).rev().map(|i| rows[i][j])),
+                    count_visible_trees(
+                        tree,
+                        ((i + 1)..rows.len()).map(|i| rows[i][j]),
+                    ),
+                    count_visible_trees(tree, row[..j].iter().rev().copied()),
+                    count_visible_trees(tree, row[(j + 1)..].iter().copied()),
+                ]
+                .into_iter()
+                .product::<usize>();
+
+                max_score = max_score.max(score);
+            }
+        }
+
+        println!("{max_score}");
+    }
 }
 
 fn do_scan<'a>(row: impl IntoIterator<Item = &'a mut (bool, i32)>) {
@@ -46,4 +90,17 @@ fn do_scan<'a>(row: impl IntoIterator<Item = &'a mut (bool, i32)>) {
             max_so_far = *tree;
         }
     }
+}
+
+fn count_visible_trees(
+    from_tree: u32,
+    trees: impl Iterator<Item = u32> + Clone,
+) -> usize {
+    let tree_lower = |other_tree: &u32| *other_tree < from_tree;
+
+    trees
+        .clone()
+        .take_while(tree_lower)
+        .chain(trees.filter(|t| !tree_lower(t)).take(1))
+        .count()
 }
