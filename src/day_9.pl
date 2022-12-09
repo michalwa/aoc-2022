@@ -21,34 +21,38 @@ digit(D)             --> [D], { char_type(D, decimal_digit) }.
 % Logic
 step(_-0, R, R, []). % for completeness
 
-step('L'-1, (Hx0,Hy)-(Tx0,Ty0), P, [P]) :-
-    P = (Hx,Hy)-(Tx,Ty),
+step('L'-1, (Hx0,Hy)-T0, P, [P]) :-
+    P = (Hx, Hy)-T,
     Hx #= Hx0 - 1,
-    ( Tx0 - Hx #= 2,  Tx #= Hx + 1, Ty #= Hy
-    ; Tx0 - Hx #\= 2, Tx #= Tx0,    Ty #= Ty0 ).
+    follow((Hx,Hy), T0, T).
 
-step('U'-1, (Hx,Hy0)-(Tx0,Ty0), P, [P]) :-
-    P = (Hx,Hy)-(Tx,Ty),
+step('U'-1, (Hx,Hy0)-T0, P, [P]) :-
+    P = (Hx,Hy)-T,
     Hy #= Hy0 + 1,
-    ( Hy - Ty0 #= 2,  Tx #= Hx,  Ty #= Hy - 1
-    ; Hy - Ty0 #\= 2, Tx #= Tx0, Ty #= Ty0 ).
+    follow((Hx,Hy), T0, T).
 
-step('R'-1, (Hx0,Hy)-(Tx0,Ty0), P, [P]) :-
-    P = (Hx,Hy)-(Tx,Ty),
+step('R'-1, (Hx0,Hy)-T0, P, [P]) :-
+    P = (Hx,Hy)-T,
     Hx #= Hx0 + 1,
-    ( Hx - Tx0 #= 2,  Tx #= Hx - 1, Ty #= Hy
-    ; Hx - Tx0 #\= 2, Tx #= Tx0,    Ty #= Ty0 ).
+    follow((Hx,Hy), T0, T).
 
-step('D'-1, (Hx,Hy0)-(Tx0,Ty0), P, [P]) :-
-    P = (Hx,Hy)-(Tx,Ty),
+step('D'-1, (Hx,Hy0)-T0, P, [P]) :-
+    P = (Hx,Hy)-T,
     Hy #= Hy0 - 1,
-    ( Ty0 - Hy #= 2,  Tx #= Hx,  Ty #= Hy + 1
-    ; Ty0 - Hy #\= 2, Tx #= Tx0, Ty #= Ty0 ).
+    follow((Hx,Hy), T0, T).
 
 step(D-S, R0, R, [P|Ps]) :-
     S #> 1, S1 #= S - 1,
     step(D-1, R0, R1, [P]),
     step(D-S1, R1, R, Ps).
+
+follow((Hx, Hy), (Tx0, Ty0), (Tx, Ty)) :-
+    ( Hx - Tx0 #=  2, Tx #= Hx - 1, Ty #= Hy
+    ; Hx - Tx0 #= -2, Tx #= Hx + 1, Ty #= Hy
+    ; Hy - Ty0 #=  2, Tx #= Hx,     Ty #= Hy - 1
+    ; Hy - Ty0 #= -2, Tx #= Hx,     Ty #= Hy + 1
+    ), !.
+follow(_, T, T).
 
 iterate_steps(Is, Ps) :- iterate_steps_(Is, (0,0)-(0,0), Ps).
 iterate_steps_([], _, []).
