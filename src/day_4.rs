@@ -1,29 +1,24 @@
-use crate::Day;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
     ops::RangeInclusive,
 };
 
-pub struct Day4;
+pub fn solve(input: BufReader<File>) {
+    let count = input
+        .lines()
+        .map(Result::unwrap)
+        .map(|line| {
+            let (a, b) = line.trim().split_once(',').unwrap();
+            (parse_range(a).unwrap(), parse_range(b).unwrap())
+        })
+        // Part 1
+        // .filter(|(a, b)| is_subrange(a, b) || is_subrange(b, a))
+        // Part 2
+        .filter(|(a, b)| is_overlapping(a, b))
+        .count();
 
-impl Day for Day4 {
-    fn solve(&self, input: BufReader<File>) {
-        let count = input
-            .lines()
-            .map(Result::unwrap)
-            .map(|line| {
-                let (a, b) = line.trim().split_once(',').unwrap();
-                (parse_range(a).unwrap(), parse_range(b).unwrap())
-            })
-            // Part 1
-            // .filter(|(a, b)| is_subrange(a, b) || is_subrange(b, a))
-            // Part 2
-            .filter(|(a, b)| is_overlapping(a, b))
-            .count();
-
-        println!("{count}");
-    }
+    println!("{count}");
 }
 
 fn parse_range(s: &str) -> Option<RangeInclusive<u32>> {

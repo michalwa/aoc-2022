@@ -15,25 +15,27 @@ fn main() -> Result<(), Box<dyn Error>> {
             .to_str()
             .and_then(|f| f.strip_suffix(".rs"))
         {
-            if let Some(day_index) = module_name.strip_prefix("day_") {
-                let struct_name = format!("Day{day_index}");
+            if module_name.starts_with("day_") {
                 writeln!(
                     output,
-                    r#"#[path = "{crate_dir}/src/{module_name}.rs"] mod {module_name}; use {module_name}::{struct_name};"#
+                    r#"#[path = "{crate_dir}/src/{module_name}.rs"] mod {module_name};"#
                 )?;
-                days.push((module_name.to_owned(), struct_name));
+                days.push(module_name.to_owned());
             }
         }
     }
 
-    writeln!(output, "fn days() -> std::collections::HashMap<&'static str, Box<dyn Day>> {{
-        let mut days = std::collections::HashMap::<_, Box<dyn Day>>::new();")?;
+    writeln!(
+        output,
+        "fn solve(day: &str, input: std::io::BufReader<std::fs::File>) {{
+            match day {{"
+    )?;
 
-    for (module_name, struct_name) in days {
-        writeln!(output, "days.insert({module_name:?}, Box::new({struct_name}));")?;
+    for module_name in days {
+        writeln!(output, "{module_name:?} => {module_name}::solve(input),")?;
     }
 
-    writeln!(output, "days }}")?;
+    writeln!(output, r#"_ => panic!("no such day: {{day}}") }} }}"#)?;
 
     Ok(())
 }
