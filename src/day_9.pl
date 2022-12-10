@@ -78,7 +78,8 @@ last([X], X).
 last([_|Xs], X) :- last(Xs, X).
 
 run :-
-    phrase_from_file(instructions(Is), 'input/day_9/input.txt'),
+    read_term(InputPath, []),
+    phrase_from_file(instructions(Is), InputPath),
     % Part 1: simulation_steps(2, Is, Rs),
     simulation_steps(10, Is, Rs),
     maplist(last, Rs, Ts),

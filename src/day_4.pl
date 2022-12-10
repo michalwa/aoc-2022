@@ -21,7 +21,8 @@ range_subrange(As-Ae, Bs-Be) :- As #=< Bs, Be #=< Ae.
 ranges_overlap(As-Ae, Bs-Be) :- As #=< Be, Ae #>= Bs.
 
 run :-
-    phrase_from_file(range_pairs(Ps), 'input/day_4/input.txt'),
+    read_term(InputPath, []),
+    phrase_from_file(range_pairs(Ps), InputPath),
     findall(A-B, (
         member(A-B, Ps),
 

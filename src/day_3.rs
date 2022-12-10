@@ -1,41 +1,36 @@
-use crate::Day;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
 };
 
-pub struct Day3;
+pub fn solve(input: BufReader<File>) {
+    let priority_sum = input
+        .lines()
+        .map(Result::unwrap)
+        // Part 1
+        // .map(|line| {
+        //     let (a, b) = line.split_at(line.len() / 2);
+        //     [a.to_owned(), b.to_owned()]
+        // })
+        // Part 2
+        .array_chunks::<3>()
+        // Both
+        .map(|lines| {
+            lines
+                .into_iter()
+                .map(|lines| {
+                    lines
+                        .bytes()
+                        .map(|b| 1u64 << priority(b))
+                        .fold(0, |a, b| a | b)
+                })
+                .reduce(|a, b| a & b)
+                .unwrap()
+        })
+        .map(sum_priorities)
+        .sum::<u32>();
 
-impl Day for Day3 {
-    fn solve(&self, input: BufReader<File>) {
-        let priority_sum = input
-            .lines()
-            .map(Result::unwrap)
-            // Part 1
-            // .map(|line| {
-            //     let (a, b) = line.split_at(line.len() / 2);
-            //     [a.to_owned(), b.to_owned()]
-            // })
-            // Part 2
-            .array_chunks::<3>()
-            // Both
-            .map(|lines| {
-                lines
-                    .into_iter()
-                    .map(|lines| {
-                        lines
-                            .bytes()
-                            .map(|b| 1u64 << priority(b))
-                            .fold(0, |a, b| a | b)
-                    })
-                    .reduce(|a, b| a & b)
-                    .unwrap()
-            })
-            .map(sum_priorities)
-            .sum::<u32>();
-
-        println!("{priority_sum}");
-    }
+    println!("{priority_sum}");
 }
 
 fn priority(byte: u8) -> u8 {

@@ -98,7 +98,8 @@ at_most(N, S) :- S #=< N.
 at_least(N, S) :- S #>= N.
 
 run :-
-    phrase_from_file(input_lines(Ls), 'input/day_7/input.txt'),
+    read_term(InputPath, []),
+    phrase_from_file(input_lines(Ls), InputPath),
     T0 = tree_wd(dir_files("/", []), []),
     foldl(mutate_tree, Ls, T0, tree_wd(T, _)),
     dir_sizes(T, Ss),
