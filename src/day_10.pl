@@ -25,18 +25,36 @@ cycle_states_(Is0, S0, [S0|Ss]) :-
     cycle(Is0, S0, S, Is1),
     cycle_states_(Is1, S, Ss).
 
+states_pixels(Ss, Ps) :- states_pixels_(Ss, 0, Ps).
+states_pixels_([], _, []).
+states_pixels_([state(X, _)|Ss], C, [P|Ps]) :-
+    H #= C rem 40,
+    ( abs(X - H) #=< 1 -> P = '@' ; P = ' ' ),
+    states_pixels_(Ss, C + 1, Ps).
+
+pixels_rows(L, Ps, [Ps]) :- length(Ps, L1), L1 #=< L.
+pixels_rows(L, Ps, [R|Rs]) :-
+    append(R, Rest, Ps),
+    length(R, L),
+    pixels_rows(L, Rest, Rs).
+
 run :-
     read_term(InputPath, []),
     phrase_from_file(instructions(Is), InputPath),
     cycle_states(Is, Ss),
-    % portray_clause(Ss),
+
+    % Part 1
     findall(Score, (
         N #= 20 + 40 * _,
         nth1(N, Ss, state(X, _)),
         Score #= N * X
-        % format("~d: ~w", [N, Score]),
-        % nl
     ), Scores),
     sum(Scores, #=, TotalScore),
     portray_clause(TotalScore),
+
+    % Part 2
+    states_pixels(Ss, Ps),
+    pixels_rows(40, Ps, Rs),
+    maplist(portray_clause, Rs),
+
     halt.
