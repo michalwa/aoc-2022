@@ -30,8 +30,8 @@ fn run_rust(solve: impl FnOnce(BufReader<File>), input_path: &str) {
 }
 
 fn run_prolog(path: &str, input_path: &str) {
-    let program = env::var("PROLOG_INTERPRETER_PATH")
-        .unwrap_or_else(|_| "scryer-prolog".to_owned());
+    let program =
+        env::var("PROLOG").unwrap_or_else(|_| "scryer-prolog".to_owned());
 
     let mut process = Command::new(program)
         .args([path, "-g", "run"])
