@@ -3,20 +3,14 @@
 :- use_module(library(dcgs)).
 :- use_module(library(clpz)).
 :- use_module(library(pio)).
-:- use_module(library(charsio)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
+:- use_module('shared.pl').
 
 % Grammar
 instructions([])     --> [].
 instructions([I|Is]) --> instruction(I), "\n", instructions(Is).
 instruction(D-N)     --> [D], " ", integer(N).
-
-integer(I)           --> digits(Ds), { number_chars(I, Ds) }.
-digits([D|Ds])       --> digit(D), maybe_digits(Ds).
-maybe_digits([])     --> [].
-maybe_digits([D|Ds]) --> digit(D), maybe_digits(Ds).
-digit(D)             --> [D], { char_type(D, decimal_digit) }.
 
 % Logic
 step(_-0, R, R, []). % for completeness

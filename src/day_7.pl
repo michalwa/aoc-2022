@@ -6,6 +6,7 @@
 :- use_module(library(lists)).
 :- use_module(library(format)).
 :- use_module(library(clpz)).
+:- use_module('shared.pl').
 
 % Relates `Ls0` to those of its elements `Ls` which satisfy `Goal`.
 % Directly copied from the source of library(clpz), sadly it's not exported
@@ -32,12 +33,6 @@ filename([C|Cs])            --> filename_char(C), maybe_filename(Cs).
 maybe_filename([])          --> [].
 maybe_filename([C|Cs])      --> filename_char(C), maybe_filename(Cs).
 filename_char(C)            --> [C], { member(C, "./") ; char_type(C, alphanumeric) }.
-
-integer(I)                  --> digits(Ds), { number_chars(I, Ds) }.
-digits([D|Ds])              --> digit(D), maybe_digits(Ds).
-maybe_digits([])            --> [].
-maybe_digits([D|Ds])        --> digit(D), maybe_digits(Ds).
-digit(D)                    --> [D], { char_type(D, decimal_digit) }.
 
 % Problem-specific logic
 

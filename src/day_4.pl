@@ -1,21 +1,16 @@
 % scryer-prolog -g run
 
 :- use_module(library(dcgs)).
-:- use_module(library(charsio)).
 :- use_module(library(pio)).
 :- use_module(library(lists)).
 :- use_module(library(clpz)).
 :- use_module(library(dif)).
+:- use_module('shared.pl').
 
 range_pairs([])      --> [].
 range_pairs([P|Ps])  --> range_pair(P), "\n", range_pairs(Ps).
 range_pair(A-B)      --> range(A), ",", range(B).
 range(S-E)           --> integer(S), "-", integer(E).
-integer(I)           --> digits(Ds), { number_chars(I, Ds) }.
-digits([D|Ds])       --> digit(D), maybe_digits(Ds).
-maybe_digits([])     --> [].
-maybe_digits([D|Ds]) --> digit(D), maybe_digits(Ds).
-digit(D)             --> [D], { char_type(D, decimal_digit) }.
 
 range_subrange(As-Ae, Bs-Be) :- As #=< Bs, Be #=< Ae.
 ranges_overlap(As-Ae, Bs-Be) :- As #=< Be, Ae #>= Bs.
