@@ -17,7 +17,7 @@ instructions([noop|Is])         --> "noop", "\n", instructions(Is).
 instructions([noop,addx(A)|Is]) --> "addx ", integer(A), "\n", instructions(Is).
 
 cycle(noop,    X,  X).
-cycle(addx(A), X0, X) :- X #= X0 + A.
+cycle(addx(A), X0, X) :- X is X0 + A.
 
 cycle_states(Is, Xs) :- cycle_states_(Is, 1, Xs).
 cycle_states_([], X, [X]).
@@ -28,11 +28,11 @@ cycle_states_([I|Is], X0, [X0|Xs]) :-
 states_pixels(Xs, Ps) :- states_pixels_(Xs, 0, Ps).
 states_pixels_([], _, []).
 states_pixels_([X|Xs], C, [P|Ps]) :-
-    H #= C rem 40,
-    ( abs(X - H) #=< 1 -> P = '@' ; P = ' ' ),
+    H is C rem 40,
+    ( abs(X - H) =< 1 -> P = '@' ; P = ' ' ),
     states_pixels_(Xs, C + 1, Ps).
 
-pixels_rows(L, Ps, [Ps]) :- length(Ps, L1), L1 #=< L.
+pixels_rows(L, Ps, [Ps]) :- length(Ps, L1), L1 =< L.
 pixels_rows(L, Ps, [R|Rs]) :-
     append(R, Rest, Ps),
     length(R, L),
@@ -49,7 +49,7 @@ run :-
         nth1(N, Xs, X),
         Score #= N * X
     ), Scores),
-    sum(Scores, #=, TotalScore),
+    sum_list(Scores, TotalScore),
     portray_clause(TotalScore),
 
     % Part 2

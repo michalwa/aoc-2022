@@ -5,7 +5,6 @@
 :- use_module(library(pio)).
 :- use_module(library(lists)).
 :- use_module(library(format)).
-:- use_module(library(clpz)).
 :- use_module('shared.pl').
 
 % Relates `Ls0` to those of its elements `Ls` which satisfy `Goal`.
@@ -87,10 +86,10 @@ dir_sizes(DF, [S|Ss]) :-
 dir_size(file_size(_, S), S).
 dir_size(dir_files(_, Fs), S) :-
     maplist(dir_size, Fs, Ss),
-    sum(Ss, #=, S).
+    sum_list(Ss, S).
 
-at_most(N, S) :- S #=< N.
-at_least(N, S) :- S #>= N.
+at_most(N, S) :- S =< N.
+at_least(N, S) :- S >= N.
 
 run :-
     read_term(InputPath, []),
@@ -101,13 +100,13 @@ run :-
 
     % Part 1
     % include(at_most(100000), Ss, Ss1),
-    % sum(Ss1, #=, S),
+    % sum_list(Ss1, S),
     % portray_clause(S),
 
     % Part 2
     dir_size(T, TotalSize),
-    FreeSpace #= 70000000 - TotalSize,
-    SpaceNeeded #= 30000000 - FreeSpace,
+    FreeSpace is 70000000 - TotalSize,
+    SpaceNeeded is 30000000 - FreeSpace,
     include(at_least(SpaceNeeded), Ss, Ss1),
     list_min(Ss1, Min),
     portray_clause(Min),

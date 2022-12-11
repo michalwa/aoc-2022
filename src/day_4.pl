@@ -3,7 +3,6 @@
 :- use_module(library(dcgs)).
 :- use_module(library(pio)).
 :- use_module(library(lists)).
-:- use_module(library(clpz)).
 :- use_module(library(dif)).
 :- use_module('shared.pl').
 
@@ -12,8 +11,8 @@ range_pairs([P|Ps])  --> range_pair(P), "\n", range_pairs(Ps).
 range_pair(A-B)      --> range(A), ",", range(B).
 range(S-E)           --> integer(S), "-", integer(E).
 
-range_subrange(As-Ae, Bs-Be) :- As #=< Bs, Be #=< Ae.
-ranges_overlap(As-Ae, Bs-Be) :- As #=< Be, Ae #>= Bs.
+range_subrange(As-Ae, Bs-Be) :- As =< Bs, Be =< Ae.
+ranges_overlap(As-Ae, Bs-Be) :- As =< Be, Ae >= Bs.
 
 run :-
     read_term(InputPath, []),
