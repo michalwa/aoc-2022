@@ -4,13 +4,17 @@ use std::{
     mem,
 };
 
-const NUM_ROUNDS: usize = 20;
+const NUM_ROUNDS: usize = 10_000; // Part 1: 20
 
 pub fn solve(mut input: BufReader<File>) {
     let mut contents = String::new();
     input.read_to_string(&mut contents).unwrap();
 
     let mut monkeys = parse_monkeys(&contents);
+
+    // Common multiple of `test_divisor`-s, we can get away with just multiplying
+    // them because they're small and because in the inputs they're always primes anyway.
+    let modulus = monkeys.iter().map(|m| m.test_divisor).product::<u64>();
 
     for _ in 0..NUM_ROUNDS {
         for i in 0..monkeys.len() {
@@ -25,7 +29,10 @@ pub fn solve(mut input: BufReader<File>) {
                     ..
                 } = monkeys[i];
 
-                let worry = operation.eval(item) / 3;
+                // Part 1
+                // let worry = operation.eval(item) / 3;
+                let worry = operation.eval(item) % modulus;
+
                 if worry % test_divisor == 0 {
                     monkeys[monkey_if_true].items.push(worry);
                 } else {
@@ -46,9 +53,9 @@ pub fn solve(mut input: BufReader<File>) {
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<u32>,
+    items: Vec<u64>,
     operation: Operation,
-    test_divisor: u32,
+    test_divisor: u64,
     monkey_if_true: usize,
     monkey_if_false: usize,
     num_inspections: usize,
@@ -63,7 +70,7 @@ enum Operation {
 #[derive(Debug, Clone, Copy)]
 enum Operand {
     Old,
-    Const(u32),
+    Const(u64),
 }
 
 fn parse_monkeys(contents: &str) -> Vec<Monkey> {
@@ -74,7 +81,7 @@ fn parse_monkeys(contents: &str) -> Vec<Monkey> {
 
             let items = trim_prefix("Starting items: ", lines[0])
                 .split(", ")
-                .map(|num| num.parse::<u32>())
+                .map(|num| num.parse::<u64>())
                 .collect::<Result<Vec<_>, _>>()
                 .unwrap();
 
@@ -89,7 +96,7 @@ fn parse_monkeys(contents: &str) -> Vec<Monkey> {
             let operation = Operation::from_items(lhs, operator, rhs).unwrap();
 
             let test_divisor = trim_prefix("Test: divisible by ", lines[2])
-                .parse::<u32>()
+                .parse::<u64>()
                 .unwrap();
 
             let monkey_if_true =
@@ -126,7 +133,7 @@ impl Operand {
         }
     }
 
-    fn eval(self, old: u32) -> u32 {
+    fn eval(self, old: u64) -> u64 {
         match self {
             Self::Old => old,
             Self::Const(c) => c,
@@ -143,7 +150,7 @@ impl Operation {
         }
     }
 
-    fn eval(self, old: u32) -> u32 {
+    fn eval(self, old: u64) -> u64 {
         match self {
             Self::Add(lhs, rhs) => lhs.eval(old) + rhs.eval(old),
             Self::Mul(lhs, rhs) => lhs.eval(old) * rhs.eval(old),
