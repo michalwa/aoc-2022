@@ -25,9 +25,9 @@ pub fn solve(input: BufReader<File>) {
     }
 
     let end = end.unwrap();
-    let path = astar(&rows, start.unwrap(), end);
 
     // Part 1
+    // let path = astar(&rows, start.unwrap(), end);
     // println!("{}", path.len() - 1);
 
     let mut min_len = usize::MAX;
