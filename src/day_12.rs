@@ -4,6 +4,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+#[allow(unused)]
 pub fn solve(input: BufReader<File>) {
     let rows = input
         .lines()
