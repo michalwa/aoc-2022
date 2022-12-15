@@ -33,7 +33,7 @@ run :-
         position_in_range(X-Y, SB),
         fd_dom(X, Dom)
     ), Doms),
-    foldl(fd_union, Doms, 1..0, Dom),
+    foldl(fd_union, Doms, 1'..'0, Dom),
     X in Dom,
     fd_size(X, NPositions),
 
