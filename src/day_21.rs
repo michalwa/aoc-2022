@@ -1,5 +1,4 @@
 use std::{
-    collections::HashSet,
     fs::File,
     io::{BufRead, BufReader},
     mem,
@@ -39,14 +38,7 @@ pub fn solve(input: BufReader<File>) {
         }
     }
 
-    monkeys = resolve_monkeys(monkeys, Default::default());
-    let root = monkeys
-        .into_iter()
-        .find(|(name, _)| name == "root")
-        .unwrap()
-        .1;
-
-    println!("root = {}", root.value().unwrap());
+    println!("root = {}", resolve_monkey("root", &mut monkeys).unwrap());
 }
 
 #[derive(Debug, Clone)]
@@ -89,68 +81,75 @@ impl Operator {
     }
 }
 
-fn resolve_monkeys(
-    monkeys: Vec<(String, Monkey)>,
-    mut resolved_monkeys: HashSet<String>,
-) -> Vec<(String, Monkey)> {
-    let monkeys_to_resolve = monkeys
+fn resolve_monkey(
+    name: &str,
+    monkeys: &mut Vec<(String, Monkey)>,
+) -> Option<u64> {
+    let known_values = monkeys
         .iter()
-        .filter(|(name, _)| !resolved_monkeys.contains(name.as_str()))
-        .filter_map(|(name, monkey)| Some(name.clone()).zip(monkey.value()))
+        .filter_map(|(name, monkey)| monkey.value().map(|v| (name.clone(), v)))
         .collect::<Vec<_>>();
 
-    let mut result = monkeys;
-    let mut run_again = false;
+    resolve_monkey_(name, mem::take(monkeys), known_values)
+}
 
-    for (name, value) in monkeys_to_resolve {
-        let mut monkey_referenced = false;
-
-        for (other_name, monkey) in mem::take(&mut result) {
-            let new_monkey = match monkey {
+fn resolve_monkey_(
+    root_name: &str,
+    mut monkeys: Vec<(String, Monkey)>,
+    mut known_values: Vec<(String, u64)>,
+) -> Option<u64> {
+    for (name, value) in mem::take(&mut known_values) {
+        for (other_name, monkey) in mem::take(&mut monkeys) {
+            match monkey {
                 Monkey::Op(
                     Operand::Monkey(m),
                     op,
                     rhs @ Operand::Monkey(_),
                 ) if m == name => {
-                    monkey_referenced = true;
-                    Monkey::Op(Operand::Value(value), op, rhs)
+                    monkeys.push((
+                        other_name,
+                        Monkey::Op(Operand::Value(value), op, rhs),
+                    ));
                 }
                 Monkey::Op(
                     lhs @ Operand::Monkey(_),
                     op,
                     Operand::Monkey(m),
                 ) if m == name => {
-                    monkey_referenced = true;
-                    Monkey::Op(lhs, op, Operand::Value(value))
+                    monkeys.push((
+                        other_name,
+                        Monkey::Op(lhs, op, Operand::Value(value)),
+                    ));
                 }
                 Monkey::Op(Operand::Monkey(m), op, Operand::Value(rhs))
                     if m == name =>
                 {
-                    monkey_referenced = true;
-                    run_again = true;
-                    Monkey::Value(op.eval(value, rhs))
+                    let value = op.eval(value, rhs);
+                    if other_name == root_name {
+                        return Some(value);
+                    }
+
+                    known_values.push((other_name.clone(), value));
                 }
                 Monkey::Op(Operand::Value(lhs), op, Operand::Monkey(m))
                     if m == name =>
                 {
-                    monkey_referenced = true;
-                    run_again = true;
-                    Monkey::Value(op.eval(lhs, value))
+                    let value = op.eval(lhs, value);
+                    if other_name == root_name {
+                        return Some(value);
+                    }
+
+                    known_values.push((other_name.clone(), value));
                 }
-                m => m,
-            };
-
-            result.push((other_name, new_monkey));
-        }
-
-        if !monkey_referenced {
-            resolved_monkeys.insert(name);
+                Monkey::Value(_) => (),
+                m => monkeys.push((other_name, m)),
+            }
         }
     }
 
-    if run_again {
-        resolve_monkeys(result, resolved_monkeys)
+    if !known_values.is_empty() {
+        resolve_monkey_(root_name, monkeys, known_values)
     } else {
-        result
+        None
     }
 }
